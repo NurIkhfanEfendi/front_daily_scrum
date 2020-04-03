@@ -14,8 +14,8 @@
                     Hi, Siswa
                   </a>
                   <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                    <a class="dropdown-item">
-                      <i class="mdi mdi-logout text-primary"></i>
+                    <a class="dropdown-item" v-if="isLoggedIn" @click="logout">
+                      <i class="mdi mdi-logout text-primary" ></i>
                       Logout
                     </a>
                   </div>
@@ -42,3 +42,26 @@
       </nav>
     </div>
 </template>
+<script>
+export default {
+    name: 'navbar',
+    computed : {
+        isLoggedIn : function(){ return this.$store.getters.isLoggedIn}
+    },
+    methods:{
+      logout:function(){
+          let conf = { headers : {"Authorization" : "Bearer " + localStorage.getItem("Authorization")} };
+          let form = new FormData();
+          this.axios.post('/logout', form, conf).then(response => {
+            if (response.data.logged === false || response.data.status === 0) {
+                this.$store.commit('logout')
+                localStorage.removeItem("Authorization")
+                this.$router.push({name: 'login'})
+            }
+          }).catch(error => {
+
+        });
+      },
+  },
+}
+</script>
